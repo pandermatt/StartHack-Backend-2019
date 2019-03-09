@@ -1,11 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/pandermatt/StartHackBackend/pkg/db"
 	"github.com/pandermatt/StartHackBackend/pkg/rental"
 )
 
@@ -16,9 +18,12 @@ const (
 var cars []rental.Car
 var person rental.Person
 var reduction rental.Reduction
+var db *sql.DB
 
 func main() {
-	addCars()
+	db = database.OpenDB()
+	defer db.Close()
+	database.AddCars(db)
 	router := mux.NewRouter()
 	router.HandleFunc("/login", checkLogin).Methods("POST")
 	router.HandleFunc("/rent/{id}", rentCar).Methods("POST")
@@ -28,14 +33,6 @@ func main() {
 	router.HandleFunc("/subscription", subs).Methods("POST")
 	log.Printf("listening on port %s", port)
 	log.Fatal(http.ListenAndServe(port, router))
-}
-
-// add the standard cars
-func addCars() {
-	cars = []rental.Car{}
-	cars = append(cars, rental.Car{ID: "1", Name: "Volvo Typ 1", Rented: false, Image: "https://www.telegraph.co.uk/cars/images/2017/02/15/Volvo-S90-main_trans_NvBQzQNjv4BqLXKfuYoUkiu2TOJRKe-bQKhpKWSvo7bYwCFSVLx1AKs.jpg"})
-	cars = append(cars, rental.Car{ID: "2", Name: "Volvo Typ 2", Rented: false, Image: "https://media.wired.com/photos/59e65901a00183307dad41f3/master/w_2400,c_limit/VolvoPolestarTA.jpg"})
-	cars = append(cars, rental.Car{ID: "3", Name: "Volvo Typ 3", Rented: false, Image: "https://pictures.dealer.com/s/sandbergnorthwestvolvovcna/0217/c9c8d64fa9f413ea7a8d514bb5749ca9x.jpg?impolicy=resize&w=1024"})
 }
 
 // check the login and return 200OK

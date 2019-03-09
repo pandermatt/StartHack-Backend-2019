@@ -29,6 +29,7 @@ type Login struct {
 
 // Reduction holds the information for the price reduction
 type Reduction struct {
-	Clean  int `json:"clean"`
-	Fueled int `json:"fueled"`
+	Name   string `json:"name"`
+	Clean  int    `json:"clean"`
+	Fueled int    `json:"fueled"`
 }
