@@ -86,11 +86,19 @@ func subs(w http.ResponseWriter, r *http.Request) {
 
 // reduce remarks the points a user has accumulated
 func reduce(w http.ResponseWriter, r *http.Request) {
-	err := json.NewDecoder(r.Body).Decode(&reduction)
+	tmp := rental.Reduction{Clean: 0, Fueled: 0}
+	err := json.NewDecoder(r.Body).Decode(&tmp)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print(reduction)
+	if &tmp != nil && &tmp.Clean != nil {
+		reduction.Clean += tmp.Clean
+	}
+	if &tmp != nil && &tmp.Fueled != nil {
+		reduction.Fueled += tmp.Fueled
+	}
+	reduction.Clean += tmp.Clean
+	reduction.Fueled += tmp.Fueled
 	json.NewEncoder(w).Encode(reduction)
 }
 
