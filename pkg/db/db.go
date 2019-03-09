@@ -54,3 +54,22 @@ func AddCars(db *sql.DB) {
 		}
 	}
 }
+
+// GetCars returns all the cars in the database
+func GetCars(db *sql.DB) []rental.Car {
+	cars := []rental.Car{}
+	rows, err := db.Query("select id, name, image, rented from cars")
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var car rental.Car
+		err = rows.Scan(&car.ID, &car.Name, &car.Image, &car.Rented)
+		if err != nil {
+			log.Fatal(err)
+		}
+		cars = append(cars, car)
+	}
+	return cars
+}

@@ -15,9 +15,6 @@ const (
 	port = ":8000"
 )
 
-var cars []rental.Car
-var person rental.Person
-var reduction rental.Reduction
 var db *sql.DB
 
 func main() {
@@ -37,6 +34,7 @@ func main() {
 
 // check the login and return 200OK
 func checkLogin(w http.ResponseWriter, r *http.Request) {
+	var person rental.Person
 	l := rental.Login{Correct: true}
 	_ = json.NewDecoder(r.Body).Decode(&person)
 	if person.PW != "test" {
@@ -52,6 +50,7 @@ func checkLogin(w http.ResponseWriter, r *http.Request) {
 func rentCar(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	index := 0
+	cars := database.GetCars(db)
 	for i, v := range cars {
 		if params["id"] == v.ID {
 			index = i
@@ -68,11 +67,12 @@ func rentCar(w http.ResponseWriter, r *http.Request) {
 
 // get all the cars
 func getCars(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(cars)
+	json.NewEncoder(w).Encode(database.GetCars(db))
 }
 
 // subs adds a subscription
 func subs(w http.ResponseWriter, r *http.Request) {
+	var person rental.Person
 	err := json.NewDecoder(r.Body).Decode(&person)
 	if err != nil {
 		log.Fatal(err)
@@ -83,6 +83,7 @@ func subs(w http.ResponseWriter, r *http.Request) {
 
 // reduce remarks the points a user has accumulated
 func reduce(w http.ResponseWriter, r *http.Request) {
+	var reduction rental.Reduction
 	err := json.NewDecoder(r.Body).Decode(&reduction)
 	if err != nil {
 		log.Fatal(err)
@@ -93,5 +94,6 @@ func reduce(w http.ResponseWriter, r *http.Request) {
 
 // getReduction returns the reduction
 func getReduction(w http.ResponseWriter, r *http.Request) {
+	var reduction rental.Reduction
 	json.NewEncoder(w).Encode(reduction)
 }
