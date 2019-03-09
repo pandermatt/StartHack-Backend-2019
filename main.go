@@ -51,8 +51,10 @@ func checkLogin(w http.ResponseWriter, r *http.Request) {
 // rent a car
 func rentCar(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	index := 0
 	for i, v := range cars {
 		if params["id"] == v.ID {
+			index = i
 			if cars[i].Rented == true {
 				cars[i].Rented = false
 			} else {
@@ -61,7 +63,7 @@ func rentCar(w http.ResponseWriter, r *http.Request) {
 			log.Printf("car %s is now %t", cars[i].Name, cars[i].Rented)
 		}
 	}
-	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cars[index])
 }
 
 // get all the cars
