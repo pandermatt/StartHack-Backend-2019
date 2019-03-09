@@ -2,8 +2,9 @@ package rental
 
 // Person defines a person
 type Person struct {
-	PW   string `json:"pw"`
-	Name string `json:"name"`
+	PW           string `json:"pw"`
+	Name         string `json:"name"`
+	Subscription string `json:"subscription"`
 }
 
 // Rental specifies a car which can be rented

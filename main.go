@@ -14,6 +14,7 @@ const (
 )
 
 var cars []rental.Car
+var person rental.Person
 
 func main() {
 	addCars()
@@ -21,6 +22,7 @@ func main() {
 	router.HandleFunc("/login", checkLogin).Methods("POST")
 	router.HandleFunc("/rent/{id}", rentCar).Methods("POST")
 	router.HandleFunc("/cars", getCars).Methods("GET")
+	router.HandleFunc("/subscription", subs).Methods("POST")
 	log.Printf("listening on port %s", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
@@ -35,11 +37,13 @@ func addCars() {
 
 // check the login and return 200OK
 func checkLogin(w http.ResponseWriter, r *http.Request) {
-	var p rental.Person
 	l := rental.Login{Correct: true}
-	err := json.NewDecoder(r.Body).Decode(&p)
-	if err != nil || p.PW != "test" {
+	_ = json.NewDecoder(r.Body).Decode(&person)
+	if person.PW != "test" {
 		l.Correct = false
+		log.Print("login false")
+	} else {
+		log.Print("login true")
 	}
 	json.NewEncoder(w).Encode(l)
 }
@@ -63,4 +67,14 @@ func rentCar(w http.ResponseWriter, r *http.Request) {
 // get all the cars
 func getCars(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cars)
+}
+
+// subs adds a subscription
+func subs(w http.ResponseWriter, r *http.Request) {
+	err := json.NewDecoder(r.Body).Decode(&person)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Print(person.Subscription)
+	json.NewEncoder(w).Encode(person)
 }
