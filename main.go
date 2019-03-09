@@ -37,11 +37,17 @@ func checkLogin(w http.ResponseWriter, r *http.Request) {
 	var person rental.Person
 	l := rental.Login{Correct: true}
 	_ = json.NewDecoder(r.Body).Decode(&person)
-	if person.PW != "test" {
+	if !database.UserExists(person.Name, db) {
 		l.Correct = false
-		log.Print("login false")
+		// insert new user, the password will be set to the one
+		// he entered
+		database.InsertNewUser(person.Name, person.PW, db)
+		log.Print("inserted new user")
 	} else {
-		log.Print("login true")
+		if !database.CheckUserPw(person.Name, person.PW, db) {
+			l.Correct = false
+		}
+		log.Print("checked existing user against his password")
 	}
 	json.NewEncoder(w).Encode(l)
 }
@@ -54,14 +60,9 @@ func rentCar(w http.ResponseWriter, r *http.Request) {
 	for i, v := range cars {
 		if params["id"] == v.ID {
 			index = i
-			if cars[i].Rented == true {
-				cars[i].Rented = false
-			} else {
-				cars[i].Rented = true
-			}
-			log.Printf("car %s is now %t", cars[i].Name, cars[i].Rented)
 		}
 	}
+	database.UpdateCar(cars[index].ID, !cars[index].Rented, db)
 	json.NewEncoder(w).Encode(cars[index])
 }
 
@@ -77,7 +78,7 @@ func subs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Print(person.Subscription)
+	database.UpdateSubs(person.Name, person.Subscription, db)
 	json.NewEncoder(w).Encode(person)
 }
 

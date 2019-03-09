@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -72,4 +73,67 @@ func GetCars(db *sql.DB) []rental.Car {
 		cars = append(cars, car)
 	}
 	return cars
+}
+
+// UserExists checks if the user already exists
+func UserExists(u string, db *sql.DB) bool {
+	rows, err := db.Query(fmt.Sprintf("select name, pw, subscription from users where name = %s", u))
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	people := []rental.Person{}
+	for rows.Next() {
+		var person rental.Person
+		err = rows.Scan(&person.Name, &person.PW, &person.Subscription)
+		if err != nil {
+			log.Fatal(err)
+		}
+		people = append(people, person)
+	}
+	return len(people) >= 1
+}
+
+// CheckUserPw checks if the password matches
+// the one in the database
+func CheckUserPw(u, p string, db *sql.DB) bool {
+	rows, err := db.Query(fmt.Sprintf("select name, pw, subscription from users where name = %s", u))
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	people := []rental.Person{}
+	for rows.Next() {
+		var person rental.Person
+		err = rows.Scan(&person.Name, &person.PW, &person.Subscription)
+		if err != nil {
+			log.Fatal(err)
+		}
+		people = append(people, person)
+	}
+	return people[0].PW == p
+}
+
+// InsertNewUser inserts a new user with the given password
+func InsertNewUser(u, p string, db *sql.DB) {
+	_, err := db.Query(fmt.Sprintf("insert into persons (name, pw, subscription) values (%s, %s, %s)", u, p, ""))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// UpdateCar updates the state of the car
+func UpdateCar(id string, rented bool, db *sql.DB) {
+	_, err := db.Query(fmt.Sprintf("update cars set rental = %t where id = %s", rented, id))
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// UpdateSubs updates the state of the car
+func UpdateSubs(name, subs string, db *sql.DB) {
+	_, err := db.Query(fmt.Sprintf("update persons set subscription = %s where name = %s", subs, name))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
