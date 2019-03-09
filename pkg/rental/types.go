@@ -20,3 +20,8 @@ type Car struct {
 	Image  string `json:"image"`
 	ID     string `json:"id"`
 }
+
+// Login contains the infos about the information
+type Login struct {
+	Correct bool `json:"login"`
+}

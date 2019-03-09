@@ -36,14 +36,12 @@ func addCars() {
 // check the login and return 200OK
 func checkLogin(w http.ResponseWriter, r *http.Request) {
 	var p rental.Person
+	l := rental.Login{Correct: true}
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil || p.PW != "test" {
-		log.Fatalf("error: %e or wrong password", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		l.Correct = false
 	}
-	log.Printf("user %s attempted login", p.Name)
-	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(l)
 }
 
 // rent a car
