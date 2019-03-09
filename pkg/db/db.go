@@ -26,6 +26,8 @@ func OpenDB() *sql.DB {
 		log.Fatal(err)
 	}
 
+	log.Print("openend db successfully")
+
 	_, err = db.Exec(tblUser)
 	_, err = db.Exec(tblCar)
 	_, err = db.Exec(tblReduction)
@@ -77,9 +79,9 @@ func GetCars(db *sql.DB) []rental.Car {
 
 // UserExists checks if the user already exists
 func UserExists(u string, db *sql.DB) bool {
-	rows, err := db.Query(fmt.Sprintf("select name, pw, subscription from users where name = %s", u))
+	rows, err := db.Query(fmt.Sprintf("select * from persons where name = %s", u))
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	defer rows.Close()
 	people := []rental.Person{}
