@@ -18,7 +18,7 @@ var cars []rental.Car
 func main() {
 	addCars()
 	router := mux.NewRouter()
-	router.HandleFunc("/login", checkLogin).Methods("GET")
+	router.HandleFunc("/login", checkLogin).Methods("POST")
 	router.HandleFunc("/rent/{id}", rentCar).Methods("POST")
 	router.HandleFunc("/cars", getCars).Methods("GET")
 	log.Printf("listening on port %s", port)
