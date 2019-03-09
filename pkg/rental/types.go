@@ -26,3 +26,9 @@ type Car struct {
 type Login struct {
 	Correct bool `json:"login"`
 }
+
+// Reduction holds the information for the price reduction
+type Reduction struct {
+	Clean  int `json:"clean"`
+	Fueled int `json:"fueled"`
+}
